@@ -7,7 +7,28 @@ AS = $(TOOLPREFIX)gcc
 LD = $(TOOLPREFIX)ld
 GDB = gdb-multiarch
 
-CFLAGS = -ffreestanding
+BUILD_DIR=build
+
+ASM_SRCS=$(wildcard kernel/arch/riscv64/boot/*.S)
+ASM_OBJS=$(addprefix $(BUILD_DIR)/, $(addsuffix .o, $(basename $(notdir $(ASM_SRCS)))))
+C_SRCS=$(wildcard kernel/arch/riscv64/boot/*.c)
+C_OBJS=$(addprefix $(BUILD_DIR)/, $(addsuffix .o, $(basename $(notdir $(C_SRCS)))))
+# C_HEADERS=kernel/include/arch/plat/generic/
+C_HEADERS=kernel/include/
+
+OBJS=$(C_OBJS) $(ASM_OBJS) 
+
+
+CFLAGS = -ffreestanding -nostdlib
+CFLAGS += -Wall -Werror -O -fno-omit-frame-pointer -ggdb
+# CFLAGS += MD
+CFLAGS = -std=c17
+CFLAGS += mcmodel=medany
+CFLAGS += -ffreestanding -fno-common -nostdlib -mno-relax
+CFLAGS += -I$C_HEADERS
+CFLAGS += $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
+
+
 LD_FLAGS = -z max-page-size=4096
 # qemu paras
 QEMU = qemu-system-riscv64
@@ -26,12 +47,13 @@ QEMUOPTS=-nographic \
 	 -kernel $(BUILD_DIR)/kernel \
 	#  -s -S 
 
-BUILD_DIR=build
 
-ASM_SRCS=$(wildcard kernel/arch/riscv64/boot/*.S)
-ASM_OBJS=$(addprefix $(BUILD_DIR)/, $(addsuffix .o, $(basename $(notdir $(ASM_SRCS)))))
 
-OBJS=$(ASM_OBJS)
+
+
+$(C_OBJS):$(C_SRCS)
+	@mkdir -p $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(ASM_OBJS):$(ASM_SRCS)
 	@mkdir -p $(BUILD_DIR)
