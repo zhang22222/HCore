@@ -9,6 +9,7 @@ SECTIONS
 
     stext = .;
     .text : {
+        *(.text.entry)
         *(.text .text.*)
     }
     etext = .;
@@ -16,14 +17,14 @@ SECTIONS
     . = ALIGN(4k);
     srodata = .;
     .rodata : {
-        *(.rodata)
+        *(.rodata .rodata.*)
     }
     erodata = .;
 
     . = ALIGN(4k);
     sdata = .;
     .data : {
-        *(.data)
+        *(.data .data.*)
     }
 
     edata = .;
@@ -31,7 +32,7 @@ SECTIONS
     . = ALIGN(4k);
     sbss = .;
     .bss : {
-        *(.bss)
+        *(.bss .bss.*)
     }
     ebss = .;
 
