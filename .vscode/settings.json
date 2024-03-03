@@ -1,5 +1,9 @@
 {
     "files.associations": {
-        "micro.h": "c"
+        "micro.h": "c",
+        "sbi_ecall_interface.h": "c",
+        "sbi_string.h": "c",
+        "types.h": "c",
+        "sbi.h": "c"
     }
 }
